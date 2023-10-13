@@ -1,5 +1,3 @@
-var { defineSupportCode } = require('cucumber');
-
 const mockClient = require('../../../../backendMock/client/index');
 const roleAssignmentMock = require('../../../../backendMock/services/roleAssignments/index');
 
@@ -11,7 +9,6 @@ const waMockData = require('../../../mockData/workAllocation/mockData');
 const headerPage = require('../../../../e2e/features/pageObjects/headerPage');
 const SoftAssert = require('../../../util/softAssert');
 const CucumberReporter = require('../../../../codeceptCommon/reportLogger');
-const taskListPage = require('../../../../e2e/features/pageObjects/workAllocation/taskListPage');
 const TaskListTable = require('../../../../e2e/features/pageObjects/workAllocation/taskListTable');
 const BrowserUtil = require('../../../util/browserUtil');
 const BrowserWaits = require('../../../../e2e/support/customWaits');
@@ -21,11 +18,10 @@ const workallocationMockData = require('../../../mockData/workAllocation/mockDat
 const userRolesConfig = require('../../../../e2e/config/userRolesConfig');
 
 const userUtil = require('../../../util/userRole');
-const { DataTableArgument } = require('codeceptjs');
 
 const loginPage = require('../../../../e2e/features/pageObjects/loginLogoutObjects');
 
-    const taskListTable = new TaskListTable();
+const taskListTable = new TaskListTable();
 
 const testData = require('../../../../e2e/config/appTestConfig');
 
@@ -33,14 +29,12 @@ const idamLogin = require('../../../util/idamLogin');
 const browser = require('../../../../codeceptCommon/browser');
 const reportLogger = require('../../../../codeceptCommon/reportLogger');
 
-let invalidCredentialsCounter = 0;
 let testCounter = 0;
-let firstAttemptFailedLogins = 0;
 
 async function loginattemptCheckAndRelogin(username, password, world) {
     testCounter++;
     let loginAttemptRetryCounter = 1;
-    const baseUrl = process.env.TEST_URL || 'http://localhost:3000/'
+    const baseUrl = process.env.TEST_URL || 'http://localhost:3000/';
 
     await browser.get(baseUrl);
     await BrowserWaits.waitForElement(loginPage.emailAddress);
@@ -121,7 +115,7 @@ async function loginattemptCheckAndRelogin(username, password, world) {
         })
 
         const authCookies = idamLogin.xuiCallbackResponse.details.setCookies
-        const authCookie = authCookies.find(cookie => cookie.name === '__auth__')
+        const authCookie = authCookies.find((cookie) => cookie.name === '__auth__')
         await browser.sleep(10)
         await mockClient.updateAuthSessionWithRoles(authCookie.value, roles)
         return await idamLogin.getUserDetails()
@@ -129,7 +123,7 @@ async function loginattemptCheckAndRelogin(username, password, world) {
         // await browser.get('http://localhost:3000/');
     }
 
-    Given('I set MOCK with {string} release user and roles', async function (releaseUer,datatableroles ) {
+    Given('I set MOCK with {string} release user and roles', async function (releaseUer, datatableroles) {
 
         const datatablehashes = datatableroles.hashes();
         const roles = datatablehashes.map(roleHash => roleHash.ROLE);
@@ -245,10 +239,10 @@ async function loginattemptCheckAndRelogin(username, password, world) {
         const boolAttributes = ['isCaseAllocator','bookable'];
         const userDetails = global.scenarioData[userDetailsRef];
         const roleAssignmentArr = [];
-        for (let roleAssignment of roleAssignments.hashes()){
+        for (const roleAssignment of roleAssignments.hashes()){
             const roleKeys = Object.keys(roleAssignment);
 
-            boolAttributes.forEach(attr => {
+            boolAttributes.forEach((attr) => {
                 if (roleKeys.includes(attr)){
                     roleAssignment[attr] = roleAssignment[attr] === "true";
                 }

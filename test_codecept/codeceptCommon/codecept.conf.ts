@@ -1,34 +1,29 @@
 
-const report = require("multiple-cucumber-html-reporter");
-const { merge } = require('mochawesome-merge')
-const marge = require('mochawesome-report-generator')
-const fs = require('fs')
-const path = require('path')
+const report = require('multiple-cucumber-html-reporter');
+const fs = require('fs');
+const path = require('path');
 
-const global = require('./globals')
-import applicationServer from '../localServer'
+import applicationServer from '../localServer';
 
-var spawn = require('child_process').spawn;
 const backendMockApp = require('../backendMock/app');
-const statsReporter = require('./statsReporter')
+const statsReporter = require('./statsReporter');
 
 let executionResult = 'passed';
 
-let appWithMockBackend = null;
-const testType = process.env.TEST_TYPE
+const testType = process.env.TEST_TYPE;
 
-const debugMode = process.env.DEBUG && process.env.DEBUG.includes('true')
+const debugMode = process.env.DEBUG && process.env.DEBUG.includes('true');
 
-const parallel = process.env.PARALLEL ? process.env.PARALLEL === "true" : false
-const head = process.env.HEAD
-console.log(`testType : ${testType}`)
-console.log(`parallel : ${parallel}`)
-console.log(`headless : ${!head}`)
+const parallel = process.env.PARALLEL ? process.env.PARALLEL === 'true' : false;
+const head = process.env.HEAD;
+console.log(`testType : ${testType}`);
+console.log(`parallel : ${parallel}`);
+console.log(`headless : ${!head}`);
 
 const testUrl = process.env.TEST_URL || '';
 const pipelineBranch = testUrl.toLowerCase().includes('pr-') || testUrl.includes('manage-case.aat') ? "preview" : "master";
 
-let features = ''
+let features = '';
 if (testType === 'e2e' || testType === 'smoke'){  
   features = `../e2e/features/app/**/*.feature`
 } else if (testType === 'ngIntegration' && pipelineBranch === 'preview'){
@@ -69,7 +64,6 @@ exports.config = {
       restart: true,
       keepCookies: false,
       keepBrowserState: false,
-      smartWait: 50000,
       waitForTimeout: 90000,
       chrome: {
         ignoreHTTPSErrors: true,
@@ -80,18 +74,15 @@ exports.config = {
         args: [
           `${head ? '' : '--headless'}`,
           '—disable-notifications',
-          '--smartwait',
           '--disable-gpu',
           '--no-sandbox',
           '--allow-running-insecure-content',
           '--ignore-certificate-errors',
           '--window-size=1440,1400',
           '--viewport-size=1440,1400',
-
-           '--disable-setuid-sandbox', '--no-zygote ', '--disableChecks'
+          '--disable-setuid-sandbox', '--no-zygote ', '--disableChecks'
         ]
       }
-      
     },
     // Playwright: {
     //   url: "https://manage-case.aat.platform.hmcts.net",
@@ -246,21 +237,6 @@ async function teardown(){
   // process.exit(1);
 }
 
-
-async function mochawesomeGenerateReport(){
-  const report = await merge({
-    files: [`${functional_output_dir}/*.json`]
-  })
-  await marge.create(report, {
-    "reportDir": `${functional_output_dir}/`,
-    "reportFilename": `${functional_output_dir}/report`,
-  });
-
-  console.log(`FAILED: ${report.stats.failures}, PASSED: ${report.stats.passes}, TOTAL: ${report.stats.tests}`)
-
-  return report.stats.failures > 0 ? 'FAIL' : 'PASS';
-}
-
 async function generateCucumberReport(){
   console.log('Generating cucumber report')
 
@@ -287,7 +263,7 @@ async function generateCucumberReport(){
         },
       }
     });
-  console.log('completed cucumber report')
+  console.log('completed cucumber report');
   
 
 }
@@ -303,7 +279,7 @@ function processCucumberJsonReports() {
 
       const ObjCount = json.length;
       for (let i = 0; i < ObjCount; i++) {
-        const obj = json[i]
+        const obj = json[i];
         for (const element of obj.elements) {
           for (const step of element.steps) {
             executionOutcomes[step.result.status] = step.result.status
@@ -312,17 +288,16 @@ function processCucumberJsonReports() {
             }
             for (const embedd of step.embeddings) {
               if (embedd.mime_type === 'text/plain' && !embedd.data.startsWith('=>')){
-                embedd.data = new Buffer(embedd.data, 'base64').toString('ascii')
+                embedd.data = new Buffer(embedd.data, 'base64').toString('ascii');
               }
             }
           }
         }
       }
-      fs.writeFileSync(functional_output_dir + '/' + f, JSON.stringify(json, null, 2))
+      fs.writeFileSync(functional_output_dir + '/' + f, JSON.stringify(json, null, 2));
     }
   }
-  console.log(executionOutcomes)
-
+  console.log(executionOutcomes);
 
   return executionResult;
 }

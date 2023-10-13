@@ -26,6 +26,8 @@ async function initBrowser() {
   await page.goto('http://localhost:4200/');
   await page.setCookie({ name: 'scenarioMockPort', value: '' + MockApp.serverPort });
   // await page.goto("http://localhost:4200/");
+
+  await testBrowser.close();
 }
 
 async function pa11ytest(test, actions, startUrl, roles) {

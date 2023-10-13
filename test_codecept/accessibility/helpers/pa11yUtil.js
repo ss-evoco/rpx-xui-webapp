@@ -42,6 +42,7 @@ async function initBrowser() {
     }
     await page.goto("http://localhost:3000/");
 
+    await testBrowser.close();
 }
 
 async function pa11ytest(test, actions, startUrl, roles) {
